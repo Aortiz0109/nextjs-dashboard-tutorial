@@ -4,6 +4,8 @@ import { z } from 'zod'; // Import the zod library for schema validation
 import { revalidatePath } from 'next/cache'; // Import the revalidatePath function from next/cache
 import { redirect } from 'next/navigation'; // Import the redirect function from next/navigation
 import postgres from 'postgres'; // Import the postgres library for database operations
+import { signIn } from '@/auth';
+import { AuthError } from 'next-auth';
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' }); // Initialize the postgres library with the database URL and SSL settings
 
@@ -111,4 +113,23 @@ export async function deleteInvoice(id: string) {
     WHERE id = ${id}
   `; // Delete the invoice from the database
     revalidatePath('/dashboard/invoices'); // Revalidate the invoices page to reflect the deleted invoice
+}
+
+export async function authenticate(
+  prevState: string | undefined,
+  formData: FormData,
+) {
+  try {
+    await signIn('credentials', formData);
+  } catch (error) {
+    if (error instanceof AuthError) {
+      switch (error.type) {
+        case 'CredentialsSignin':
+          return 'Invalid credentials.';
+        default:
+          return 'Something went wrong.';
+      }
+    }
+    throw error;
+  }
 }

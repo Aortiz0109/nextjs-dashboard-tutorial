@@ -2,6 +2,11 @@ import Form from '@/app/ui/invoices/edit-form';
 import Breadcrumbs from '@/app/ui/invoices/breadcrumbs';
 import { fetchInvoiceById,fetchCustomers } from '@/app/lib/data';
 import { notFound } from 'next/navigation';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: "Edit Invoice",
+};
  
 export default async function Page(props: { params: Promise<{ id: string }> }) { // Define the Page component that receives props with a params promise
   const params = await props.params; // Await the params promise to get the invoice ID
